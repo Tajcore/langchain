@@ -50,7 +50,8 @@ class SQLDatabaseChain(Chain):
     to fix the initial SQL from the LLM."""
     query_checker_prompt: Optional[BasePromptTemplate] = None
     """The prompt template that should be used by the query checker"""
-
+    execute_query: bool = True
+    """Whether or not to execute the query on the database. If False, the query will be returned as the result."""
     class Config:
         """Configuration for this pydantic object."""
 
@@ -123,6 +124,8 @@ class SQLDatabaseChain(Chain):
                     sql_cmd
                 )  # output: sql generation (no checker)
                 intermediate_steps.append({"sql_cmd": sql_cmd})  # input: sql exec
+                if not self.execute_query:
+                    return {"sql_query": sql_cmd}
                 result = self.database.run(sql_cmd)
                 intermediate_steps.append(str(result))  # output: sql exec
             else:
@@ -148,6 +151,8 @@ class SQLDatabaseChain(Chain):
                 intermediate_steps.append(
                     {"sql_cmd": checked_sql_command}
                 )  # input: sql exec
+                if not self.execute_query:
+                    return {"sql_query": checked_sql_command}
                 result = self.database.run(checked_sql_command)
                 intermediate_steps.append(str(result))  # output: sql exec
                 sql_cmd = checked_sql_command
