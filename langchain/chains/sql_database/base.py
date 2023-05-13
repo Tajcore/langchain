@@ -125,7 +125,7 @@ class SQLDatabaseChain(Chain):
                 )  # output: sql generation (no checker)
                 intermediate_steps.append({"sql_cmd": sql_cmd})  # input: sql exec
                 if not self.execute_query:
-                    return {"sql_query": sql_cmd}
+                    return {"sql_query": sql_cmd, "result": None}
                 result = self.database.run(sql_cmd)
                 intermediate_steps.append(str(result))  # output: sql exec
             else:
@@ -152,7 +152,7 @@ class SQLDatabaseChain(Chain):
                     {"sql_cmd": checked_sql_command}
                 )  # input: sql exec
                 if not self.execute_query:
-                    return {"sql_query": checked_sql_command}
+                    return {"sql_query": checked_sql_command, "result": None}
                 result = self.database.run(checked_sql_command)
                 intermediate_steps.append(str(result))  # output: sql exec
                 sql_cmd = checked_sql_command
